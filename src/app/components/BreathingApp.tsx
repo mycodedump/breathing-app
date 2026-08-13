@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { MountainBackground } from "./MountainBackground";
 import { SunCharacter } from "./SunCharacter";
 import { useAmbientSound } from "./useAmbientSound";
-import { Play, Pause, X, Volume2, VolumeX, Clock, Wind } from "lucide-react";
+import { Play, Pause, X, Volume2, VolumeX, Vibrate, VibrateOff, Clock, Wind } from "lucide-react";
 
 type Phase = "idle" | "inhale" | "hold-in" | "exhale" | "hold-out";
 type Screen = "home" | "countdown" | "session" | "complete";
@@ -61,10 +61,10 @@ function formatTime(seconds: number) {
 }
 
 const HAPTIC_PATTERNS: Record<"inhale" | "exhale" | "hold" | "tap", number[]> = {
-  inhale: [30, 80, 30],
-  exhale: [60],
-  hold: [15],
-  tap: [10],
+  inhale: [40, 100, 40],
+  exhale: [90],
+  hold: [25],
+  tap: [15],
 };
 
 interface HapticDebugInfo {
@@ -73,15 +73,22 @@ interface HapticDebugInfo {
   secureContext: boolean;
   sticky?: boolean;
   transient?: boolean;
-  result: boolean | "unsupported";
+  result: boolean | "unsupported" | "muted";
 }
 
 let hapticDebugListener: ((info: HapticDebugInfo) => void) | null = null;
+let hapticsEnabledGlobal = true;
 
-/** Trigger haptic feedback using Vibration API (Android only - iOS Safari has no Vibration API) */
+/**
+ * Trigger haptic feedback using the Vibration API (Android only - iOS Safari
+ * has no Vibration API). The browser only controls vibration *duration*, not
+ * amplitude/intensity - how strong it feels is up to the device's own OS
+ * settings (e.g. Android's touch vibration intensity), so identical calls
+ * can feel very different across phones.
+ */
 function haptic(pattern: "inhale" | "exhale" | "hold" | "tap") {
   const supported = typeof navigator.vibrate === "function";
-  const result = supported ? navigator.vibrate(HAPTIC_PATTERNS[pattern]) : "unsupported";
+  const result = !hapticsEnabledGlobal ? "muted" : supported ? navigator.vibrate(HAPTIC_PATTERNS[pattern]) : "unsupported";
   if (hapticDebugListener) {
     const activation = (navigator as unknown as { userActivation?: { hasBeenActive: boolean; isActive: boolean } })
       .userActivation;
@@ -104,6 +111,7 @@ export function BreathingApp() {
   const [sessionDuration, setSessionDuration] = useState(3);
   const [isPaused, setIsPaused] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [hapticsEnabled, setHapticsEnabled] = useState(true);
   const [cycleCount, setCycleCount] = useState(0);
   const [selectedPattern, setSelectedPattern] = useState(BREATHING_PATTERNS[0]);
   const [countdown, setCountdown] = useState(3);
@@ -113,6 +121,10 @@ export function BreathingApp() {
   const { start: startSound, stop: stopSound, playCue } = useAmbientSound();
 
   const debugMode = new URLSearchParams(window.location.search).get("debug") === "1";
+
+  useEffect(() => {
+    hapticsEnabledGlobal = hapticsEnabled;
+  }, [hapticsEnabled]);
 
   // Surface haptic call results on-screen when ?debug=1 is in the URL, so
   // vibration issues can be diagnosed on a phone without remote devtools.
@@ -450,7 +462,7 @@ export function BreathingApp() {
             transition={{ duration: 0.8 }}
           >
             {/* Top bar */}
-            <div className="flex items-center justify-between w-full">
+            <div className="grid grid-cols-[40px_1fr_auto] items-center w-full">
               <motion.button
                 className="w-10 h-10 rounded-full bg-[#d8d8b9]/40 backdrop-blur-sm flex items-center justify-center text-[#3b4a30]"
                 onClick={endSession}
@@ -460,7 +472,7 @@ export function BreathingApp() {
               </motion.button>
 
               <motion.div
-                className="px-3 py-1 rounded-full bg-[#d8d8b9]/30 backdrop-blur-sm text-[#3b4a30]"
+                className="justify-self-center px-3 py-1 rounded-full bg-[#d8d8b9]/30 backdrop-blur-sm text-[#3b4a30]"
                 style={{ fontSize: 14, fontWeight: 500 }}
                 animate={{ opacity: [0.6, 1, 0.6] }}
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
@@ -468,13 +480,23 @@ export function BreathingApp() {
                 {formatTime(sessionTimeLeft)}
               </motion.div>
 
-              <motion.button
-                className="w-10 h-10 rounded-full bg-[#d8d8b9]/40 backdrop-blur-sm flex items-center justify-center text-[#3b4a30]"
-                onClick={() => setSoundEnabled(!soundEnabled)}
-                whileTap={{ scale: 0.9 }}
-              >
-                {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-              </motion.button>
+              <div className="flex items-center gap-2 justify-self-end">
+                <motion.button
+                  className="w-10 h-10 rounded-full bg-[#d8d8b9]/40 backdrop-blur-sm flex items-center justify-center text-[#3b4a30]"
+                  onClick={() => setHapticsEnabled(!hapticsEnabled)}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  {hapticsEnabled ? <Vibrate size={16} /> : <VibrateOff size={16} />}
+                </motion.button>
+
+                <motion.button
+                  className="w-10 h-10 rounded-full bg-[#d8d8b9]/40 backdrop-blur-sm flex items-center justify-center text-[#3b4a30]"
+                  onClick={() => setSoundEnabled(!soundEnabled)}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                </motion.button>
+              </div>
             </div>
 
             {/* Center: phase label with readable background pill */}
