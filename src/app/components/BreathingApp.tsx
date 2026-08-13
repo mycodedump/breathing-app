@@ -60,25 +60,39 @@ function formatTime(seconds: number) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-/** Trigger haptic feedback using Vibration API (Android) */
+const HAPTIC_PATTERNS: Record<"inhale" | "exhale" | "hold" | "tap", number[]> = {
+  inhale: [30, 80, 30],
+  exhale: [60],
+  hold: [15],
+  tap: [10],
+};
+
+interface HapticDebugInfo {
+  pattern: string;
+  supported: boolean;
+  secureContext: boolean;
+  sticky?: boolean;
+  transient?: boolean;
+  result: boolean | "unsupported";
+}
+
+let hapticDebugListener: ((info: HapticDebugInfo) => void) | null = null;
+
+/** Trigger haptic feedback using Vibration API (Android only - iOS Safari has no Vibration API) */
 function haptic(pattern: "inhale" | "exhale" | "hold" | "tap") {
-  if (!navigator.vibrate) return;
-  switch (pattern) {
-    case "inhale":
-      // Two gentle pulses: "breathe in" feeling
-      navigator.vibrate([30, 80, 30]);
-      break;
-    case "exhale":
-      // One longer, softer pulse: "let go" feeling
-      navigator.vibrate([60]);
-      break;
-    case "hold":
-      // Single subtle tick
-      navigator.vibrate([15]);
-      break;
-    case "tap":
-      navigator.vibrate([10]);
-      break;
+  const supported = typeof navigator.vibrate === "function";
+  const result = supported ? navigator.vibrate(HAPTIC_PATTERNS[pattern]) : "unsupported";
+  if (hapticDebugListener) {
+    const activation = (navigator as unknown as { userActivation?: { hasBeenActive: boolean; isActive: boolean } })
+      .userActivation;
+    hapticDebugListener({
+      pattern,
+      supported,
+      secureContext: window.isSecureContext,
+      sticky: activation?.hasBeenActive,
+      transient: activation?.isActive,
+      result,
+    });
   }
 }
 
@@ -94,8 +108,21 @@ export function BreathingApp() {
   const [selectedPattern, setSelectedPattern] = useState(BREATHING_PATTERNS[0]);
   const [countdown, setCountdown] = useState(3);
   const [sunRise, setSunRise] = useState(0);
+  const [hapticDebug, setHapticDebug] = useState<HapticDebugInfo | null>(null);
   const phaseIndexRef = useRef(0);
   const { start: startSound, stop: stopSound, playCue } = useAmbientSound();
+
+  const debugMode = new URLSearchParams(window.location.search).get("debug") === "1";
+
+  // Surface haptic call results on-screen when ?debug=1 is in the URL, so
+  // vibration issues can be diagnosed on a phone without remote devtools.
+  useEffect(() => {
+    if (!debugMode) return;
+    hapticDebugListener = setHapticDebug;
+    return () => {
+      hapticDebugListener = null;
+    };
+  }, [debugMode]);
 
   // Start countdown
   const startSession = useCallback(() => {
@@ -572,6 +599,17 @@ export function BreathingApp() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {debugMode && (
+        <div
+          className="absolute bottom-2 left-2 right-2 rounded-lg bg-black/80 text-white px-3 py-2"
+          style={{ zIndex: 50, fontSize: 11, fontFamily: "monospace", lineHeight: 1.5 }}
+        >
+          {hapticDebug
+            ? `last: ${hapticDebug.pattern} → result=${hapticDebug.result} · supported=${hapticDebug.supported} · secureContext=${hapticDebug.secureContext} · sticky=${hapticDebug.sticky} · transient=${hapticDebug.transient}`
+            : "no haptic call yet - tap Begin"}
+        </div>
+      )}
     </div>
   );
 }
