@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { MountainBackground } from "./MountainBackground";
 import { SunCharacter } from "./SunCharacter";
 import { useAmbientSound } from "./useAmbientSound";
-import { Play, Pause, X, Volume2, VolumeX, Vibrate, VibrateOff, Clock, Wind } from "lucide-react";
+import { Play, Pause, X, Volume2, VolumeX, Clock, Wind } from "lucide-react";
 
 type Phase = "idle" | "inhale" | "hold-in" | "exhale" | "hold-out";
 type Screen = "home" | "countdown" | "session" | "complete";
@@ -462,7 +462,7 @@ export function BreathingApp() {
             transition={{ duration: 0.8 }}
           >
             {/* Top bar */}
-            <div className="grid grid-cols-[40px_1fr_auto] items-center w-full">
+            <div className="flex items-center justify-between w-full">
               <motion.button
                 className="w-10 h-10 rounded-full bg-[#d8d8b9]/40 backdrop-blur-sm flex items-center justify-center text-[#3b4a30]"
                 onClick={endSession}
@@ -472,7 +472,7 @@ export function BreathingApp() {
               </motion.button>
 
               <motion.div
-                className="justify-self-center px-3 py-1 rounded-full bg-[#d8d8b9]/30 backdrop-blur-sm text-[#3b4a30]"
+                className="px-3 py-1 rounded-full bg-[#d8d8b9]/30 backdrop-blur-sm text-[#3b4a30]"
                 style={{ fontSize: 14, fontWeight: 500 }}
                 animate={{ opacity: [0.6, 1, 0.6] }}
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
@@ -480,23 +480,17 @@ export function BreathingApp() {
                 {formatTime(sessionTimeLeft)}
               </motion.div>
 
-              <div className="flex items-center gap-2 justify-self-end">
-                <motion.button
-                  className="w-10 h-10 rounded-full bg-[#d8d8b9]/40 backdrop-blur-sm flex items-center justify-center text-[#3b4a30]"
-                  onClick={() => setHapticsEnabled(!hapticsEnabled)}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  {hapticsEnabled ? <Vibrate size={16} /> : <VibrateOff size={16} />}
-                </motion.button>
-
-                <motion.button
-                  className="w-10 h-10 rounded-full bg-[#d8d8b9]/40 backdrop-blur-sm flex items-center justify-center text-[#3b4a30]"
-                  onClick={() => setSoundEnabled(!soundEnabled)}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-                </motion.button>
-              </div>
+              <motion.button
+                className="w-10 h-10 rounded-full bg-[#d8d8b9]/40 backdrop-blur-sm flex items-center justify-center text-[#3b4a30]"
+                onClick={() => {
+                  const next = !soundEnabled;
+                  setSoundEnabled(next);
+                  setHapticsEnabled(next);
+                }}
+                whileTap={{ scale: 0.9 }}
+              >
+                {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+              </motion.button>
             </div>
 
             {/* Center: phase label with readable background pill */}
