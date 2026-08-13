@@ -232,12 +232,14 @@ export function BreathingApp() {
           : phase;
 
   return (
-    <div className="relative w-full h-full max-w-[430px] mx-auto bg-[#c1d4d2] overflow-hidden select-none">
-      {/* Mountains (z 2-5) */}
-      <MountainBackground />
-
-      {/* Sun - sits above mountains (z 6, positioned at top) */}
+    <div
+      className="relative w-full h-full max-w-[430px] mx-auto bg-[#c1d4d2] overflow-hidden select-none @container"
+    >
+      {/* Sun - sits behind the mountains (z 1, positioned at top) */}
       <SunCharacter phase={sunPhase} riseProgress={sunRise} />
+
+      {/* Mountains (z 2-5) - rendered above the sun */}
+      <MountainBackground />
 
       {/* UI overlay (z 10) */}
       <AnimatePresence mode="wait">
@@ -261,7 +263,7 @@ export function BreathingApp() {
             >
               <h1
                 className="text-[#3b4a30] tracking-wide drop-shadow-[0_1px_2px_rgba(255,255,255,0.3)]"
-                style={{ fontSize: 30, fontWeight: 500 }}
+                style={{ fontSize: "clamp(24px, 7cqw, 30px)", fontWeight: 500 }}
               >
                 Breathe
               </h1>
@@ -383,7 +385,7 @@ export function BreathingApp() {
                 {countdown > 0 ? (
                   <span
                     className="text-[#3b4a30] drop-shadow-[0_2px_8px_rgba(255,255,255,0.3)]"
-                    style={{ fontSize: 80, fontWeight: 300, lineHeight: 1 }}
+                    style={{ fontSize: "clamp(56px, 20cqw, 80px)", fontWeight: 300, lineHeight: 1 }}
                   >
                     {countdown}
                   </span>
@@ -413,8 +415,8 @@ export function BreathingApp() {
         {screen === "session" && (
           <motion.div
             key="session"
-            className="absolute inset-0 flex flex-col items-center justify-between pb-12 pt-14 px-7"
-            style={{ zIndex: 10 }}
+            className="absolute inset-0 flex flex-col items-center justify-between pb-12 px-7"
+            style={{ zIndex: 10, paddingTop: 16 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -462,7 +464,7 @@ export function BreathingApp() {
                   <div className="px-6 py-3 rounded-full bg-[#d8d8b9]/45 backdrop-blur-md">
                     <span
                       className="text-[#3b4a30]"
-                      style={{ fontSize: 22, fontWeight: 500, letterSpacing: "0.12em" }}
+                      style={{ fontSize: "clamp(18px, 5.5cqw, 22px)", fontWeight: 500, letterSpacing: "0px" }}
                     >
                       {isPaused ? "Paused" : PHASE_LABELS[phase]}
                     </span>
@@ -539,7 +541,7 @@ export function BreathingApp() {
             >
               <h2
                 className="text-[#3b4a30] tracking-wide"
-                style={{ fontSize: 26, fontWeight: 500 }}
+                style={{ fontSize: "clamp(20px, 6.5cqw, 26px)", fontWeight: 500 }}
               >
                 Well done
               </h2>

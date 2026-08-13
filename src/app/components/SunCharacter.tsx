@@ -30,7 +30,7 @@ export function SunCharacter({ phase, riseProgress }: SunCharacterProps) {
   return (
     <motion.div
       className="absolute flex items-center justify-center"
-      style={{ top: "15%", left: "50%", translateX: "-50%", zIndex: 6 }}
+      style={{ top: "15%", left: "50%", translateX: "-50%", zIndex: 1 }}
       animate={{
         scale: sunSize,
         y: yPosition,
@@ -54,8 +54,8 @@ export function SunCharacter({ phase, riseProgress }: SunCharacterProps) {
       <motion.div
         className="absolute rounded-full"
         style={{
-          width: 260,
-          height: 260,
+          width: "clamp(160px, 58cqw, 260px)",
+          height: "clamp(160px, 58cqw, 260px)",
           background:
             "radial-gradient(circle, rgba(225,203,121,0.3) 0%, rgba(216,216,185,0.12) 50%, transparent 100%)",
         }}
@@ -72,13 +72,13 @@ export function SunCharacter({ phase, riseProgress }: SunCharacterProps) {
       {/* Outer body */}
       <div
         className="rounded-full bg-[#d8d8b9]"
-        style={{ width: 160, height: 160 }}
+        style={{ width: "clamp(100px, 36cqw, 160px)", height: "clamp(100px, 36cqw, 160px)" }}
       />
 
       {/* Inner sun */}
       <div
         className="absolute rounded-full bg-[#e1cb79]"
-        style={{ width: 110, height: 110 }}
+        style={{ width: "clamp(68px, 25cqw, 110px)", height: "clamp(68px, 25cqw, 110px)" }}
       />
 
       {/* Face - eyes and mouth */}
@@ -89,12 +89,12 @@ export function SunCharacter({ phase, riseProgress }: SunCharacterProps) {
       >
         {/* Eyes */}
         <div className="flex gap-[6px] items-center">
-          <div className="relative shrink-0" style={{ width: 21, height: 11 }}>
+          <div className="relative shrink-0" style={{ width: "clamp(14px, 4.7cqw, 21px)", height: "clamp(8px, 2.5cqw, 11px)" }}>
             <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 29 15.5">
               <path d={svgPaths.p12c87b80} fill="#CA7A0A" />
             </svg>
           </div>
-          <div className="relative shrink-0" style={{ width: 21, height: 11 }}>
+          <div className="relative shrink-0" style={{ width: "clamp(14px, 4.7cqw, 21px)", height: "clamp(8px, 2.5cqw, 11px)" }}>
             <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 29 15.5">
               <path d={svgPaths.p12c87b80} fill="#CA7A0A" />
             </svg>
@@ -103,7 +103,7 @@ export function SunCharacter({ phase, riseProgress }: SunCharacterProps) {
         {/* Mouth */}
         <motion.div
           className="relative shrink-0"
-          style={{ width: 36, height: 6 }}
+          style={{ width: "clamp(24px, 8cqw, 36px)", height: "clamp(4px, 1.4cqw, 6px)" }}
           animate={{
             scaleY: isExhaling ? 2 : 1,
             scaleX: isExhaling ? 0.75 : 1,
