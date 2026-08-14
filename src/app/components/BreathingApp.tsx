@@ -302,7 +302,7 @@ export function BreathingApp() {
             >
               <h1
                 className="text-[#3b4a30] tracking-wide drop-shadow-[0_1px_2px_rgba(255,255,255,0.3)]"
-                style={{ fontSize: "clamp(24px, 7cqw, 30px)", fontWeight: 500 }}
+                style={{ fontSize: "clamp(26px, 7cqw, 32px)", fontWeight: 500 }}
               >
                 Breathe
               </h1>
@@ -314,7 +314,7 @@ export function BreathingApp() {
               </p>
             </motion.div>
 
-            {/* Controls */}
+            {/* Pattern + session length - centered in the remaining space */}
             <motion.div
               className="flex flex-col items-center gap-5 w-full"
               initial={{ opacity: 0, y: 20 }}
@@ -385,19 +385,19 @@ export function BreathingApp() {
                   ))}
                 </div>
               </div>
-
-              {/* Begin */}
-              <motion.button
-                className="mt-3 w-full max-w-[240px] py-4 rounded-full bg-[#3b4a30]/85 text-[#d8d8b9] tracking-wider backdrop-blur-sm"
-                style={{ fontSize: 16, fontWeight: 500 }}
-                onClick={startSession}
-                whileTap={{ scale: 0.96 }}
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
-              >
-                Begin
-              </motion.button>
             </motion.div>
+
+            {/* Begin - stays anchored at the bottom */}
+            <motion.button
+              className="w-full max-w-[240px] py-4 rounded-full bg-[#3b4a30]/85 text-[#d8d8b9] tracking-wider backdrop-blur-sm"
+              style={{ fontSize: 16, fontWeight: 500 }}
+              onClick={startSession}
+              whileTap={{ scale: 0.96 }}
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+            >
+              Begin
+            </motion.button>
           </motion.div>
         )}
 
@@ -454,7 +454,7 @@ export function BreathingApp() {
         {screen === "session" && (
           <motion.div
             key="session"
-            className="absolute inset-0 flex flex-col items-center justify-between pb-12 px-7"
+            className="absolute inset-0 flex flex-col items-center justify-between pb-12 px-4"
             style={{ zIndex: 10, paddingTop: 16 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -493,7 +493,7 @@ export function BreathingApp() {
               </motion.button>
             </div>
 
-            {/* Center: phase label with readable background pill */}
+            {/* Bottom controls: phase pill, pause button, cycle count */}
             <div className="flex flex-col items-center gap-4">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -504,10 +504,10 @@ export function BreathingApp() {
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <div className="px-6 py-3 rounded-full bg-[#d8d8b9]/45 backdrop-blur-md">
+                  <div className="px-5 py-2 rounded-full bg-[#d8d8b9]/45 backdrop-blur-md">
                     <span
                       className="text-[#3b4a30]"
-                      style={{ fontSize: "clamp(18px, 5.5cqw, 22px)", fontWeight: 500, letterSpacing: "0px" }}
+                      style={{ fontSize: "clamp(13px, 4cqw, 15px)", fontWeight: 400, letterSpacing: "0px" }}
                     >
                       {isPaused ? "Paused" : PHASE_LABELS[phase]}
                     </span>
@@ -515,7 +515,7 @@ export function BreathingApp() {
                   {!isPaused &&
                     phase !== "idle" &&
                     selectedPattern.durations[phase as Exclude<Phase, "idle">] > 0 && (
-                      <motion.div className="flex gap-1.5 mt-1">
+                      <motion.div className="flex gap-1.5">
                         {Array.from({
                           length: selectedPattern.durations[phase as Exclude<Phase, "idle">],
                         }).map((_, i) => (
@@ -544,10 +544,7 @@ export function BreathingApp() {
                     )}
                 </motion.div>
               </AnimatePresence>
-            </div>
 
-            {/* Bottom controls */}
-            <div className="flex flex-col items-center gap-3">
               <motion.button
                 className="w-14 h-14 rounded-full bg-[#d8d8b9]/40 backdrop-blur-sm flex items-center justify-center text-[#3b4a30]"
                 onClick={togglePause}

@@ -27,6 +27,8 @@ export function SunCharacter({ phase, riseProgress }: SunCharacterProps) {
   // Sun descends from above (-250) to its resting place (0)
   const yPosition = phase === "hidden" ? -250 : -250 + riseProgress * 250;
 
+  const bodyScaleDuration = phase === "inhale" ? 4 : phase === "exhale" ? 6 : phase === "countdown" ? 1 : 2;
+
   return (
     <motion.div
       className="absolute flex items-center justify-center"
@@ -38,7 +40,7 @@ export function SunCharacter({ phase, riseProgress }: SunCharacterProps) {
       }}
       transition={{
         scale: {
-          duration: phase === "inhale" ? 4 : phase === "exhale" ? 6 : phase === "countdown" ? 1 : 2,
+          duration: bodyScaleDuration,
           ease: "easeInOut",
         },
         y: {
@@ -81,11 +83,16 @@ export function SunCharacter({ phase, riseProgress }: SunCharacterProps) {
         style={{ width: "clamp(68px, 25cqw, 110px)", height: "clamp(68px, 25cqw, 110px)" }}
       />
 
-      {/* Face - eyes and mouth */}
+      {/* Face - eyes and mouth. Counter-scaled against the body's breathing
+          animation so the face itself never appears to grow/shrink - it
+          only fades in/out at a constant size. */}
       <motion.div
         className="absolute flex flex-col items-center gap-[10px]"
-        animate={{ opacity: showFace ? 1 : 0 }}
-        transition={{ duration: 0.8, ease: "easeInOut" }}
+        animate={{ opacity: showFace ? 1 : 0, scale: 1 / sunSize }}
+        transition={{
+          opacity: { duration: 0.8, ease: "easeInOut" },
+          scale: { duration: bodyScaleDuration, ease: "easeInOut" },
+        }}
       >
         {/* Eyes */}
         <div className="flex gap-[6px] items-center">
