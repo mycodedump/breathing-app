@@ -272,7 +272,7 @@ export function BreathingApp() {
 
   return (
     <div
-      className="relative w-full h-full max-w-[430px] mx-auto bg-[#c1d4d2] overflow-hidden select-none @container"
+      className="relative w-full h-full max-w-[430px] mx-auto bg-[#c1d4d2] overflow-hidden select-none @container md:h-[65vh] md:rounded-[24px]"
     >
       {/* Sun - sits behind the mountains (z 1, positioned at top) */}
       <SunCharacter phase={sunPhase} riseProgress={sunRise} />
@@ -509,11 +509,12 @@ export function BreathingApp() {
             </div>
 
             {/* Bottom controls: phase pill, pause button, cycle count */}
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col items-center">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={isPaused ? "paused" : phase}
                   className="flex flex-col items-center gap-3"
+                  style={{ marginBottom: 20 }}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
@@ -560,19 +561,21 @@ export function BreathingApp() {
                 </motion.div>
               </AnimatePresence>
 
-              <motion.button
-                className="w-14 h-14 rounded-full bg-[#d8d8b9]/40 backdrop-blur-sm flex items-center justify-center text-[#3b4a30]"
-                onClick={togglePause}
-                whileTap={{ scale: 0.9 }}
-              >
-                {isPaused ? <Play size={20} /> : <Pause size={20} />}
-              </motion.button>
-              <span
-                className="text-[#3b4a30]/50"
-                style={{ fontSize: 12, fontWeight: 400 }}
-              >
-                {cycleCount} {cycleCount === 1 ? "cycle" : "cycles"}
-              </span>
+              <div className="flex flex-col items-center gap-3">
+                <motion.button
+                  className="w-14 h-14 rounded-full bg-[#d8d8b9]/40 backdrop-blur-sm flex items-center justify-center text-[#3b4a30]"
+                  onClick={togglePause}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  {isPaused ? <Play size={20} /> : <Pause size={20} />}
+                </motion.button>
+                <span
+                  className="text-[#3b4a30]/50"
+                  style={{ fontSize: 12, fontWeight: 400 }}
+                >
+                  {cycleCount} {cycleCount === 1 ? "cycle" : "cycles"}
+                </span>
+              </div>
             </div>
           </motion.div>
         )}
