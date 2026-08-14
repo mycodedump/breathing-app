@@ -398,6 +398,21 @@ export function BreathingApp() {
             >
               Begin
             </motion.button>
+
+            {/* Credit footer */}
+            <div className="absolute bottom-2 inset-x-0 flex justify-center">
+              <p className="text-[#3b4a30]/50" style={{ fontSize: 11, fontWeight: 400 }}>
+                Designed by{" "}
+                <a
+                  href="https://mycodedump.github.io/portfolio/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-[#3b4a30]/70"
+                >
+                  Laxmi Mahajan
+                </a>
+              </p>
+            </div>
           </motion.div>
         )}
 
